@@ -72,6 +72,16 @@ func updateOneBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(updateBook)
 }
 
+func deleteBook(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	bookToDelete := Book{Id: id}
+	db.Find(&bookToDelete, id)
+	db.Delete(&bookToDelete)
+	json.NewEncoder(w).Encode(bookToDelete)
+}
+
 func handleRequests() {
 	log.Println("Starting development server 127.0.0.1:9000")
 	myRouter := mux.NewRouter().StrictSlash(true)
@@ -80,6 +90,7 @@ func handleRequests() {
 	myRouter.HandleFunc("/books/", returnBooks).Methods("GET")
 	myRouter.HandleFunc("/books/{id}", returnOneBook).Methods("GET")
 	myRouter.HandleFunc("/update-book/{id}", updateOneBook).Methods("POST")
+	myRouter.HandleFunc("/delete-book/{id}", deleteBook).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":9000", myRouter))
 }
 
