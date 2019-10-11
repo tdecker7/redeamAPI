@@ -41,11 +41,34 @@ func createNewBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newBook)
 }
 
+func returnBooks(w http.ResponseWriter, r *http.Request) {
+	books := []Book{}
+	db.Find(&books)
+
+	json.NewEncoder(w).Encode(books)
+}
+
+func returnOneBook(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	title := vars["title"]
+	books := []Book{}
+	db.Find(&books)
+
+	for _, book := range books {
+		if book.Title == title {
+			fmt.Println(book)
+			json.NewEncoder(w).Encode(book)
+		}
+	}
+}
+
 func handleRequests() {
 	log.Println("Starting development server 127.0.0.1:9000")
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", handleBaseRoute)
 	myRouter.HandleFunc("/create-book", createNewBook).Methods("POST")
+	myRouter.HandleFunc("/books/", returnBooks).Methods("GET")
+	myRouter.HandleFunc("/books/{title}", returnOneBook).Methods("GET")
 	log.Fatal(http.ListenAndServe(":9000", myRouter))
 }
 
