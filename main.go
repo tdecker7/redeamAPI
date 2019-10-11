@@ -62,6 +62,16 @@ func returnOneBook(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func updateOneBook(w http.ResponseWriter, r *http.Request) {
+	reqBody, _ := ioutil.ReadAll(r.Body)
+
+	var updateBook Book
+	json.Unmarshal(reqBody, &updateBook)
+	db.Save(&updateBook)
+
+	json.NewEncoder(w).Encode(updateBook)
+}
+
 func handleRequests() {
 	log.Println("Starting development server 127.0.0.1:9000")
 	myRouter := mux.NewRouter().StrictSlash(true)
@@ -69,6 +79,7 @@ func handleRequests() {
 	myRouter.HandleFunc("/create-book", createNewBook).Methods("POST")
 	myRouter.HandleFunc("/books/", returnBooks).Methods("GET")
 	myRouter.HandleFunc("/books/{title}", returnOneBook).Methods("GET")
+	myRouter.HandleFunc("/update-book", updateOneBook).Methods("POST")
 	log.Fatal(http.ListenAndServe(":9000", myRouter))
 }
 
