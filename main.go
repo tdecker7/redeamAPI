@@ -60,9 +60,12 @@ func returnOneBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateOneBook(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
 	var updateBook Book
+	updateBook.Id = id
 	json.Unmarshal(reqBody, &updateBook)
 	db.Save(&updateBook)
 
@@ -76,7 +79,7 @@ func handleRequests() {
 	myRouter.HandleFunc("/create-book", createNewBook).Methods("POST")
 	myRouter.HandleFunc("/books/", returnBooks).Methods("GET")
 	myRouter.HandleFunc("/books/{id}", returnOneBook).Methods("GET")
-	myRouter.HandleFunc("/update-book", updateOneBook).Methods("POST")
+	myRouter.HandleFunc("/update-book/{id}", updateOneBook).Methods("POST")
 	log.Fatal(http.ListenAndServe(":9000", myRouter))
 }
 
