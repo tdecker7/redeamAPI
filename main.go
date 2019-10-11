@@ -1,21 +1,25 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+var db *gorm.DB
+var err error
+
 type Book struct {
-	Title       string    `json:"title"`
-	Author      string    `json:"author"`
-	Publisher   string    `json:"publisher"`
-	PublishDate time.Time `json:"publish_date"`
+	Title       string `json:"title"`
+	Author      string `json:"author"`
+	Publisher   string `json:"publisher"`
+	PublishDate string `json:"publish_date"`
 }
 
 func handleBaseRoute(w http.ResponseWriter, r *http.Request) {
@@ -23,15 +27,30 @@ func handleBaseRoute(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Hit the base route")
 }
 
+func createNewBook(w http.ResponseWriter, r *http.Request) {
+	log.Println("route posted: /createNewBook")
+	fmt.Println(r.Body)
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error reading the body in createNewBook: %s", err.Error())
+	}
+	var newBook Book
+	json.Unmarshal(reqBody, &newBook)
+	db.Create(&newBook)
+
+	json.NewEncoder(w).Encode(newBook)
+}
+
 func handleRequests() {
 	log.Println("Starting development server 127.0.0.1:9000")
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", handleBaseRoute)
+	myRouter.HandleFunc("/create-book", createNewBook).Methods("POST")
 	log.Fatal(http.ListenAndServe(":9000", myRouter))
 }
 
 func main() {
-	db, err := gorm.Open("postgres", "host=127.0.0.1 port=5432 user=redeamapi dbname=book_store password=N+JmM7za4^zvq4ezK-dcc*dbszRWQ*9fDc$W9Ud sslmode=disable")
+	db, err = gorm.Open("postgres", "host=127.0.0.1 port=5432 user=redeamapi dbname=book_store password=N+JmM7za4^zvq4ezK-dcc*dbszRWQ*9fDc$W9Ud sslmode=disable")
 	if err != nil {
 		log.Fatalf("Error opening postgres instance: %s", err)
 	}
