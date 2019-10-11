@@ -13,12 +13,12 @@ services:
   
   api:
     build:
-      context: ./api
+      context: ./
       args:
         app_env: ${APP_ENV}
     volumes:
-      - ./api/go/src/github.com/redeamapi
+      - ./api:/go/src/github.com/redeamapi
     ports:
-      - "5000:3000"
+      - "9000:9000"
     links:
       - db
