@@ -16,6 +16,7 @@ var db *gorm.DB
 var err error
 
 type Book struct {
+	Id          string `json:"id"`
 	Title       string `json:"title"`
 	Author      string `json:"author"`
 	Publisher   string `json:"publisher"`
@@ -50,16 +51,12 @@ func returnBooks(w http.ResponseWriter, r *http.Request) {
 
 func returnOneBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	title := vars["title"]
-	books := []Book{}
-	db.Find(&books)
+	id := vars["id"]
+	var book Book
+	db.Find(&book, id)
 
-	for _, book := range books {
-		if book.Title == title {
-			fmt.Println(book)
-			json.NewEncoder(w).Encode(book)
-		}
-	}
+	fmt.Println(book)
+	json.NewEncoder(w).Encode(book)
 }
 
 func updateOneBook(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +75,7 @@ func handleRequests() {
 	myRouter.HandleFunc("/", handleBaseRoute)
 	myRouter.HandleFunc("/create-book", createNewBook).Methods("POST")
 	myRouter.HandleFunc("/books/", returnBooks).Methods("GET")
-	myRouter.HandleFunc("/books/{title}", returnOneBook).Methods("GET")
+	myRouter.HandleFunc("/books/{id}", returnOneBook).Methods("GET")
 	myRouter.HandleFunc("/update-book", updateOneBook).Methods("POST")
 	log.Fatal(http.ListenAndServe(":9000", myRouter))
 }
