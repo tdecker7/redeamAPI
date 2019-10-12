@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
@@ -95,9 +96,16 @@ func handleRequests() {
 }
 
 func main() {
-	db, err = gorm.Open("postgres", "host=db port=5432 user=redeamapi dbname=book_store password=N+JmM7za4^zvq4ezK-dcc*dbszRWQ*9fDc$W9Ud sslmode=disable")
+	for i := 0; i < 10; i++ {
+		db, err = gorm.Open("postgres", "host=db port=5432 user=postgres dbname=book_store sslmode=disable")
+		if err == nil {
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
+	
 	if err != nil {
-		log.Fatalf("Error opening postgres instance: %s", err)
+		log.Fatalf("Error opening postgres insftance: %s", err)
 	}
 	log.Println("Connection to database established successfully.")
 	defer db.Close()

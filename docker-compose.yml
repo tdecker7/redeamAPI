@@ -2,27 +2,30 @@ version: '3'
 services:
   db:
     image: postgres
-    container_name: "pg"
-    restart: always
+    volumes: 
+      - db-data:/var/lib/postgresql/data
     ports:
-      - "54320:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
+      - 5432:5432/tcp
     environment:
-      - POSTGRES_USER=redeamapi
-      - POSTGRES_PASSWORD=N+JmM7za4^zvq4ezK-dcc*dbszRWQ*9fDc$W9Ud
-      - PGDATA/pgdata
+      - POSTGRES_DB=book_store
+  api:
+    image: golang
+    expose:
+      - 9000
+    ports:
+      - 9000:9000
+    volumes:
+      - .:/go/src/github.com/redeamapi
+    working_dir: /go/src/github.com/redeamapi
+    environment:
+      - PGUSER=postgres
+      - PGPASSWORD=N+JmM7za4^zvq4ezK-dcc*dbszRWQ*9fDc$W9Ud
+    command: go run main.go
+    depends_on:
+      - db
+    links:
+      - db:db
+
 volumes:
-  db_data:
-  
-  # api:
-  #   build:
-  #     context: ./
-  #     args:
-  #       app_env: ${APP_ENV}
-  #   volumes:
-  #     - ./api:/go/src/github.com/redeamapi
-  #   ports:
-  #     - "9000:9000"
-  #   links:
-  #     - db
+  db-data:
+    driver: local
