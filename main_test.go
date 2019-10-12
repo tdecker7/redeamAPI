@@ -38,7 +38,6 @@ func sendRequest(method, url string, body io.Reader) (*http.Response, error) {
 
 
 func TestReadAllRoute200(t *testing.T) {
-	// route := fmt.Sprintf("%s%s", baseRoute, readAllRoute)
 	resp, err := http.Get(readRoute)
 	if err != nil {
 		t.Error("Expected no error, got ", err)
@@ -94,7 +93,6 @@ func TestCreateRoute200(t *testing.T) {
 }
 
 func TestCreateRoute405(t *testing.T) {
-	// var jsonStr []byte
 	resp, err := http.Get(createRoute)
 	if err != nil {
 		t.Error("Received error in TestCreateRoute400: ", err)
