@@ -1,24 +1,28 @@
-version: '2'
+version: '3'
 services:
   db:
-    build: ./db
-    volumes:
-      - ./db/pgdata:/pgdata
+    image: postgres
+    container_name: "pg"
+    restart: always
     ports:
-      - "5432"
+      - "54320:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=redeamapi
       - POSTGRES_PASSWORD=N+JmM7za4^zvq4ezK-dcc*dbszRWQ*9fDc$W9Ud
       - PGDATA/pgdata
+volumes:
+  db_data:
   
-  api:
-    build:
-      context: ./
-      args:
-        app_env: ${APP_ENV}
-    volumes:
-      - ./api:/go/src/github.com/redeamapi
-    ports:
-      - "9000:9000"
-    links:
-      - db
+  # api:
+  #   build:
+  #     context: ./
+  #     args:
+  #       app_env: ${APP_ENV}
+  #   volumes:
+  #     - ./api:/go/src/github.com/redeamapi
+  #   ports:
+  #     - "9000:9000"
+  #   links:
+  #     - db
