@@ -17,7 +17,7 @@ var db *gorm.DB
 var err error
 
 type Book struct {
-	Id          string `json:"id"`
+	Id          string `sql:"type:serial PRIMARY KEY"`
 	Title       string `json:"title"`
 	Author      string `json:"author"`
 	Publisher   string `json:"publisher"`
@@ -44,6 +44,7 @@ func createNewBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func returnBooks(w http.ResponseWriter, r *http.Request) {
+	log.Println("route posted: /books")
 	books := []Book{}
 	db.Find(&books)
 
@@ -51,6 +52,7 @@ func returnBooks(w http.ResponseWriter, r *http.Request) {
 }
 
 func returnOneBook(w http.ResponseWriter, r *http.Request) {
+	log.Println("route posted: /books/{id}")
 	vars := mux.Vars(r)
 	id := vars["id"]
 	var book Book
@@ -61,6 +63,7 @@ func returnOneBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateOneBook(w http.ResponseWriter, r *http.Request) {
+	log.Println("route posted: /update-book/{id}")
 	vars := mux.Vars(r)
 	id := vars["id"]
 	reqBody, _ := ioutil.ReadAll(r.Body)
@@ -74,6 +77,7 @@ func updateOneBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteBook(w http.ResponseWriter, r *http.Request) {
+	log.Println("route posted: /delete-book/{id}")
 	vars := mux.Vars(r)
 	id := vars["id"]
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"bytes"
+	"io"
 )
 
 var (
@@ -13,8 +14,28 @@ var (
 	createRoute  = fmt.Sprintf("%s/create-book", baseRoute)
 	updateRoute  = fmt.Sprintf("%s/update-book/", baseRoute)
 	deleteRoute  = fmt.Sprintf("%s/delete-book/", baseRoute)
-
 )
+
+func sendRequest(method, url string, body io.Reader) (*http.Response, error) {
+	client := &http.Client{}
+	var err error
+	var resp *http.Response
+
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		fmt.Println("Error trying to send request: ", err)
+		return resp, err
+	}
+
+	resp, err = client.Do(req)
+	if err != nil {
+		fmt.Println("Error trying to send request: ", err)
+		return resp, err
+	}
+	defer resp.Body.Close()
+	return resp, err
+}
+
 
 func TestReadAllRoute200(t *testing.T) {
 	// route := fmt.Sprintf("%s%s", baseRoute, readAllRoute)
@@ -106,6 +127,23 @@ func TestUpdateRoute405(t *testing.T) {
 	}
 }
 
-func TestDeleteRoute200(t *testing.T) {}
+func TestDeleteRoute200(t *testing.T) {
+	deleteRoute = fmt.Sprintf("%s%d", deleteRoute, 1)
+	resp, err := sendRequest("DELETE", deleteRoute, nil)
+	if err != nil {
+		t.Error("Error in TestDeleteRoute200: ", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Expected status code %d, found %d", http.StatusOK, resp.StatusCode)
+	}
+}
 
-func TestDeleteRoute405(t *testing.T) {}
+func TestDeleteRoute405(t *testing.T) {
+	resp, err := sendRequest("POST", deleteRoute, nil)
+	if err != nil {
+		t.Error("Error in TestDeleteRoute405: ", err)
+	}
+	if resp.StatusCode != http.StatusMethodNotAllowed {
+		t.Errorf("Expected status code %d, found %d", http.StatusOK, resp.StatusCode)
+	}
+}
