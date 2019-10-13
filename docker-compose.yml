@@ -1,7 +1,8 @@
 version: '3'
 services:
   db:
-    image: postgres
+    build: ./db/
+    image: treydecker75/redeampi:postgres
     volumes: 
       - db-data:/var/lib/postgresql/data
     ports:
@@ -9,7 +10,8 @@ services:
     environment:
       - POSTGRES_DB=book_store
   api:
-    image: golang
+    build: ./
+    image: treydecker75/redeamapi:golang
     expose:
       - 9000
     ports:
