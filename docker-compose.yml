@@ -2,7 +2,7 @@ version: '3'
 services:
   db:
     build: ./db/
-    image: treydecker75/redeampi:postgres
+    image: treydecker75/redeamapi:postgres
     volumes: 
       - db-data:/var/lib/postgresql/data
     ports:
